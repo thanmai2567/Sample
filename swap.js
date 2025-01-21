@@ -5,4 +5,4 @@ let b = 25;
 [a, b] = [b, a];
 
 
-console.log("Updated Values= a:",a, "b:",b );
+console.log("Values after swapping = a:",a, "b:",b );
