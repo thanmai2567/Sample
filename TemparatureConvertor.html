@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+   
+       <div>
+        <h1> Temaparature Converter</h1>
+        <input type="text" placeholder="Enter Temaparature in celsius" id="celsius">
+        <input type="text" placeholder="Enter Temaparature in fahrenheit" id="fahrenheit">
+        <div>
+            <button onclick="convertFromCelsius()">convert to Fahrenheit</button>
+            <button onclick="convertFromFahrenheit()">Convert to Celsius</button>
+            </div>
+            <p id="result"></p>
+            </div>
+        <script>
+            var result=document.getElementById("result");
+            function convertFromCelsius(){
+                var celsius = document.getElementById("celsius").value;
+                if (isNaN(celsius)) {
+                result.textContent = "Please enter a valid number for Celsius.";
+                return;
+            }
+               
+                var fahrenheit=(parseFloat(celsius)*9/5)+32;
+                
+                document.getElementById("fahrenheit").value = fahrenheit.toFixed(2);
+                document.getElementById("result").innerHTML = `${celsius}°C is equal to ${fahrenheit}°F`;
+
+
+            
+          
+            }
+            function convertFromFahrenheit() {
+            var fahrenheit = parseFloat(document.getElementById("fahrenheit").value);
+
+            
+            if (isNaN(fahrenheit)) {
+                result.textContent = "Please enter a valid number for Fahrenheit.";
+                return;
+            }
+
+          
+            var celsius = (fahrenheit - 32) * 5 / 9;
+
+            
+            document.getElementById("celsius").value = celsius.toFixed(2);
+            document.getElementById("result").innerHTML = `${fahrenheit}°F is equal to ${celsius}°C`;
+
+        }
+    </script>
+</body>
+</html>
+
+       
