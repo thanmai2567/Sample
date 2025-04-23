@@ -1,0 +1,62 @@
+<h3>5-Day Forecast</h3>
+<input type="text" id="forecastCityInput" placeholder="Enter city">
+<button onclick="getForecast()">Get Forecast</button>
+<table border="1" id="forecastTable">
+  <tr>
+    <th>Date</th>
+    <th>Temperature (°C)</th>
+  </tr>
+</table>
+
+<script>
+const apiKey = 'f74bc7f093218ecccdd7ec473bea841c'; // Your API key
+
+async function getForecast() {
+  const city = document.getElementById('forecastCityInput').value;
+  if (!city) {
+    alert("Please enter a city name.");
+    return;
+  }
+
+  const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
+
+  try {
+    const response = await fetch(forecastUrl);
+    const data = await response.json();
+
+    if (data.cod !== "200") {
+      alert("City not found.");
+      return;
+    }
+
+    // Clear table and reset header
+    const forecastTable = document.getElementById('forecastTable');
+    forecastTable.innerHTML = `
+      <tr>
+        <th>Date</th>
+        <th>Temperature (°C)</th>
+      </tr>
+    `;
+
+    // Filter for data at 12:00 PM each day
+    const noonForecasts = data.list.filter(item => item.dt_txt.includes("12:00:00"));
+
+    // Populate table
+    noonForecasts.forEach(item => {
+      const date = item.dt_txt.split(" ")[0];
+      const temp = item.main.temp;
+
+      const row = `
+        <tr>
+          <td>${date}</td>
+          <td>${temp}</td>
+        </tr>
+      `;
+      forecastTable.innerHTML += row;
+    });
+  } catch (error) {
+    alert("Failed to fetch forecast data.");
+    console.error(error);
+  }
+}
+</script>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Weather Forecast App</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <h2>Current Weather (Task 2)</h2>
+  <input type="text" id="cityInput" placeholder="Enter city name">
+  <button onclick="getCurrentWeather()">Get Current Weather</button>
+  <table border="1" id="currentWeatherTable">
+    <tr>
+      <th>City</th>
+      <th>Min Temp (°C)</th>
+      <th>Max Temp (°C)</th>
+      <th>Humidity (%)</th>
+    </tr>
+  </table>
+
+  <h2>5-Day Forecast & Bar Chart (Tasks 3 & 4)</h2>
+  <input type="text" id="forecastCityInput" placeholder="Enter city name">
+  <button onclick="getForecast()">Get Forecast</button>
+  <table border="1" id="forecastTable">
+    <tr>
+      <th>Date</th>
+      <th>Temperature (°C)</th>
+    </tr>
+  </table>
+  <canvas id="forecastChart" width="600" height="300"></canvas>
+
+<script>
+const apiKey = 'f74bc7f093218ecccdd7ec473bea841c';
+let chartInstance = null;
+
+// Task 2: Fetch Current Weather
+async function getCurrentWeather() {
+  const city = document.getElementById('cityInput').value;
+  if (!city) {
+    alert("Please enter a city.");
+    return;
+  }
+
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.cod !== 200) {
+      alert("City not found!");
+      return;
+    }
+
+    const table = document.getElementById('currentWeatherTable');
+    table.innerHTML = `
+      <tr>
+        <th>City</th>
+        <th>Min Temp (°C)</th>
+        <th>Max Temp (°C)</th>
+        <th>Humidity (%)</th>
+      </tr>
+      <tr>
+        <td>${data.name}</td>
+        <td>${data.main.temp_min}</td>
+        <td>${data.main.temp_max}</td>
+        <td>${data.main.humidity}</td>
+      </tr>
+    `;
+  } catch (err) {
+    alert("Error fetching current weather.");
+    console.error(err);
+  }
+}
+
+// Tasks 3 & 4: Forecast + Chart
+async function getForecast() {
+  const city = document.getElementById('forecastCityInput').value;
+  if (!city) {
+    alert("Please enter a city.");
+    return;
+  }
+
+  const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.cod !== "200") {
+      alert("City not found!");
+      return;
+    }
+
+    const forecastTable = document.getElementById('forecastTable');
+    forecastTable.innerHTML = `
+      <tr><th>Date</th><th>Temperature (°C)</th></tr>
+    `;
+
+    const noonForecasts = data.list.filter(item => item.dt_txt.includes("12:00:00"));
+
+    const labels = [];
+    const temps = [];
+
+    noonForecasts.forEach(item => {
+      const date = item.dt_txt.split(" ")[0];
+      const temp = item.main.temp;
+      labels.push(date);
+      temps.push(temp);
+
+      forecastTable.innerHTML += `
+        <tr>
+          <td>${date}</td>
+          <td>${temp}</td>
+        </tr>
+      `;
+    });
+
+    const ctx = document.getElementById('forecastChart').getContext('2d');
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Temperature (°C)',
+          data: temps,
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+
+  } catch (err) {
+    alert("Error fetching forecast.");
+    console.error(err);
+  }
+}
+</script>
+
+</body>
+</html>
